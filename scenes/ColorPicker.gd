@@ -1,7 +1,20 @@
 extends Control
 
+onready var await_server = false
 
-
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	pass 
+
+func button_pressed(color):
+	await_server = true
+	PlayerSettings.color = color
+	Server.requestPlayerSettings(color, PlayerSettings.title, self.get_instance_id())
+
+func acceptPlayerSettings():
+	queue_free()
+
+func denyPlayerSettings(type):
+	if type == "title":
+		PlayerSettings.title = str(Server.self_id)
+	if type == "color":
+		await_server = false
