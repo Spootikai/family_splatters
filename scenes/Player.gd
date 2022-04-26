@@ -41,13 +41,15 @@ export var attack_charge: float = 0
 
 # CREATION CODE
 func _ready():
-	Server.fetchPlayerData(game_id, self.get_instance_id())
+	#Server.fetchPlayerData(game_id, self.get_instance_id())
+	pass
 
 # TICK PROCESSES
 func _process(delta):
 	# SERVER SHIT
 	if local_owned:
-		updatePlayerPosition(game_id)
+		#updatePlayerPosition(game_id)
+		pass
 	
 	# DETECT INPUTS (IF OWNED BY CLIENT)
 	if local_owned: 	

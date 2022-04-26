@@ -1,3 +1,4 @@
+
 extends Control
 
 
@@ -19,3 +20,4 @@ func _on_TextureButton_pressed():
 
 func _on_VolumeSlider_value_changed(value):
 	$Panel/VolumeLabel.text = str(value)
+

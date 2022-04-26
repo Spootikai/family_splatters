@@ -16,18 +16,21 @@ func _on_connection_failed():
 
 func _on_connection_succeeded():
 	print("Successfully connected")
-	self_id = get_tree().get_network_unique_id()
+
 	get_tree().change_scene("res://scenes/Lobby.tscn")
+	self_id = get_tree().get_network_unique_id()
 
-# Send over player settings
-remote func fetchPlayerSettings():
-	rpc_id(1, "returnPlayerSettings", PlayerSettings.color, PlayerSettings.title)
 
-# Fetch player data (username, color, mode)
-func fetchPlayerData(peer_id, requester):
-	rpc_id(1, "fetchPlayerData", peer_id, requester)
-remote func returnPlayerData(s_mode, s_title, s_color, requester):
-	instance_from_id(requester).setPlayerData(s_mode, s_title, Color(s_color))
+# Player settings
+# Make sure to set colors to ARGB64 and revert back after sending
+func requestPlayerSettings(color, title, requester):
+	rpc_id(1, "requestPlayerSettings", color.to_argb64(), title, requester)
+
+remote func acceptPlayerSettings(requester):
+	instance_from_id(requester).acceptPlayerSettings()
+
+remote func denyPlayerSettings(type, requester):
+	instance_from_id(requester).denyPlayerSettings(type)
 
 # Request to start game
 func startGame(id):

@@ -1,8 +1,12 @@
 extends Control
 
+onready var colorpicker_instance = preload("res://scenes/ColorPicker.tscn")
 onready var lobby_icon_instance = preload("res://scenes/LobbyIcon.tscn")
 
 func _ready():
+	var new_colorpicker = colorpicker_instance.instance()
+	$CenterContainer.add_child(new_colorpicker)
+	
 	if PlayerSettings.is_host:
 		$Button.disabled = false
 

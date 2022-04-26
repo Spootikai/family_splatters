@@ -1,3 +1,4 @@
+
 [gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://themes/normal_menu.tres" type="Theme" id=1]
@@ -77,3 +78,4 @@ align = 1
 
 [connection signal="value_changed" from="Panel/VolumeSlider" to="." method="_on_VolumeSlider_value_changed"]
 [connection signal="pressed" from="Panel/TextureButton" to="." method="_on_TextureButton_pressed"]
+
