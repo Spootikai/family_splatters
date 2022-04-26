@@ -20,13 +20,13 @@ func _on_connection_succeeded():
 	get_tree().change_scene("res://scenes/Lobby.tscn")
 	self_id = get_tree().get_network_unique_id()
 
-
 # Player settings
 # Make sure to set colors to ARGB64 and revert back after sending
 func requestPlayerSettings(color, title, requester):
 	rpc_id(1, "requestPlayerSettings", color.to_argb64(), title, requester)
 
-remote func acceptPlayerSettings(requester):
+remote func acceptPlayerSettings(s_is_host, requester):
+	PlayerSettings.is_host = s_is_host
 	instance_from_id(requester).acceptPlayerSettings()
 
 remote func denyPlayerSettings(type, requester):
