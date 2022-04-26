@@ -42,11 +42,11 @@ columns = 6
 rect_scale = Vector2( 1, 1 )
 color = Color( 0.85098, 0, 0, 1 )
 
-[node name="TextureButton2" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton8" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 231.0
 margin_right = 458.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 0, 0.368627, 1, 1 )
+color = Color( 0, 0.976471, 1, 1 )
 
 [node name="TextureButton3" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 462.0
@@ -61,55 +61,55 @@ margin_right = 920.0
 rect_scale = Vector2( 1, 1 )
 color = Color( 0.172549, 1, 0, 1 )
 
-[node name="TextureButton5" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton7" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 924.0
 margin_right = 1151.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 1, 0.658824, 0, 1 )
+color = Color( 1, 0, 0.984314, 1 )
 
-[node name="TextureButton6" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton11" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 1155.0
 margin_right = 1382.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 0.592157, 0, 1, 1 )
+color = Color( 1, 1, 1, 1 )
 
-[node name="TextureButton7" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton10" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_top = 275.0
 margin_bottom = 546.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 1, 0, 0.984314, 1 )
+color = Color( 0.301961, 0, 0.105882, 1 )
 
-[node name="TextureButton8" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton2" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 231.0
 margin_top = 275.0
 margin_right = 458.0
 margin_bottom = 546.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 0, 0.976471, 1, 1 )
+color = Color( 0, 0.368627, 1, 1 )
 
-[node name="TextureButton9" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton5" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 462.0
 margin_top = 275.0
 margin_right = 689.0
 margin_bottom = 546.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 0, 0.415686, 0.101961, 1 )
+color = Color( 1, 0.470588, 0, 1 )
 
-[node name="TextureButton10" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton9" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 693.0
 margin_top = 275.0
 margin_right = 920.0
 margin_bottom = 546.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 0.301961, 0, 0.105882, 1 )
+color = Color( 0, 0.415686, 0.101961, 1 )
 
-[node name="TextureButton11" parent="Panel/GridContainer" instance=ExtResource( 3 )]
+[node name="TextureButton6" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 924.0
 margin_top = 275.0
 margin_right = 1151.0
 margin_bottom = 546.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 1, 1, 1, 1 )
+color = Color( 0.458824, 0, 0.776471, 1 )
 
 [node name="TextureButton12" parent="Panel/GridContainer" instance=ExtResource( 3 )]
 margin_left = 1155.0
@@ -117,4 +117,4 @@ margin_top = 275.0
 margin_right = 1382.0
 margin_bottom = 546.0
 rect_scale = Vector2( 1, 1 )
-color = Color( 0.133333, 0.133333, 0.133333, 1 )
+color = Color( 0.243137, 0.243137, 0.243137, 1 )
