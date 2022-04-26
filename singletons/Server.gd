@@ -20,7 +20,6 @@ func _on_connection_succeeded():
 	get_tree().change_scene("res://scenes/Lobby.tscn")
 	self_id = get_tree().get_network_unique_id()
 
-
 # Player settings
 # Make sure to set colors to ARGB64 and revert back after sending
 func requestPlayerSettings(color, title, requester):
