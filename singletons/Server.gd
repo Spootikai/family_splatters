@@ -25,7 +25,8 @@ func _on_connection_succeeded():
 func requestPlayerSettings(color, title, requester):
 	rpc_id(1, "requestPlayerSettings", color.to_argb64(), title, requester)
 
-remote func acceptPlayerSettings(requester):
+remote func acceptPlayerSettings(s_is_host, requester):
+	PlayerSettings.is_host = s_is_host
 	instance_from_id(requester).acceptPlayerSettings()
 
 remote func denyPlayerSettings(type, requester):
