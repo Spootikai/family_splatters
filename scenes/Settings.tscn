@@ -1,8 +1,16 @@
-[gd_scene load_steps=4 format=2]
+
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://themes/normal_menu.tres" type="Theme" id=1]
-[ext_resource path="res://assets/circle.png" type="Texture" id=2]
+[ext_resource path="res://assets/UI Art/exit-hover.png" type="Texture" id=2]
 [ext_resource path="res://scenes/Settings.gd" type="Script" id=3]
+[ext_resource path="res://assets/UI Art/familysplatter-panel.png" type="Texture" id=4]
+[ext_resource path="res://assets/UI Art/exit-normal.png" type="Texture" id=5]
+[ext_resource path="res://assets/UI Art/exit-pressed.png" type="Texture" id=6]
+
+[sub_resource type="StyleBoxTexture" id=1]
+texture = ExtResource( 4 )
+region_rect = Rect2( 0, 0, 930, 890 )
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -14,11 +22,12 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -448.0
-margin_top = -418.5
-margin_right = 448.0
-margin_bottom = 418.5
+margin_left = -450.0
+margin_top = -425.0
+margin_right = 450.0
+margin_bottom = 425.0
 theme = ExtResource( 1 )
+custom_styles/panel = SubResource( 1 )
 
 [node name="VolumeSlider" type="HSlider" parent="Panel"]
 anchor_left = 0.5
@@ -49,13 +58,15 @@ text = "Volume"
 align = 1
 
 [node name="TextureButton" type="TextureButton" parent="Panel"]
-margin_left = 835.0
-margin_top = 8.5
-margin_right = 1035.0
-margin_bottom = 208.5
-rect_scale = Vector2( 0.25, 0.25 )
+anchor_right = 0.083
+margin_left = 800.0
+margin_top = 58.0
+margin_right = 781.3
+margin_bottom = 115.0
 theme = ExtResource( 1 )
-texture_normal = ExtResource( 2 )
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 6 )
+texture_hover = ExtResource( 2 )
 
 [node name="VolumeLabel" type="Label" parent="Panel"]
 margin_left = 686.0
@@ -67,3 +78,4 @@ align = 1
 
 [connection signal="value_changed" from="Panel/VolumeSlider" to="." method="_on_VolumeSlider_value_changed"]
 [connection signal="pressed" from="Panel/TextureButton" to="." method="_on_TextureButton_pressed"]
+

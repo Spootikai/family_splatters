@@ -1,8 +1,15 @@
-[gd_scene load_steps=4 format=2]
+
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://scenes/ColorPicker.gd" type="Script" id=1]
 [ext_resource path="res://themes/normal_menu.tres" type="Theme" id=2]
 [ext_resource path="res://scenes/ColorButton.tscn" type="PackedScene" id=3]
+
+[ext_resource path="res://assets/UI Art/familysplatter-panel.png" type="Texture" id=4]
+
+[sub_resource type="StyleBoxTexture" id=1]
+texture = ExtResource( 4 )
+region_rect = Rect2( 0, 0, 930, 890 )
 
 [node name="ColorPicker" type="Control"]
 anchor_right = 1.0
@@ -15,10 +22,13 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -477.0
-margin_top = -293.0
-margin_right = 477.0
-margin_bottom = 293.0
+
+margin_left = -448.5
+margin_top = -271.5
+margin_right = 448.5
+margin_bottom = 271.5
+custom_styles/panel = SubResource( 1 )
+
 
 [node name="Label" type="Label" parent="Panel"]
 anchor_left = 0.5
@@ -31,10 +41,12 @@ text = "Choose Your Color"
 align = 1
 
 [node name="GridContainer" type="GridContainer" parent="Panel"]
-margin_left = 131.0
-margin_top = 142.0
-margin_right = 1521.0
-margin_bottom = 956.0
+
+margin_left = 100.5
+margin_top = 130.5
+margin_right = 1490.5
+margin_bottom = 944.5
+
 rect_scale = Vector2( 0.5, 0.5 )
 columns = 6
 

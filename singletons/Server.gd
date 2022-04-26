@@ -16,6 +16,7 @@ func _on_connection_failed():
 
 func _on_connection_succeeded():
 	print("Successfully connected")
+
 	get_tree().change_scene("res://scenes/Lobby.tscn")
 	self_id = get_tree().get_network_unique_id()
 
