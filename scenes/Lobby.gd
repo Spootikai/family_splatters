@@ -1,3 +1,4 @@
+
 extends Control
 
 onready var colorpicker_instance = preload("res://scenes/ColorPicker.tscn")
