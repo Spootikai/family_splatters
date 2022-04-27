@@ -38,6 +38,7 @@ margin_top = 230.0
 margin_right = 800.0
 margin_bottom = 340.0
 rect_min_size = Vector2( 0, 110 )
+
 text = "35.160.170.69"
 
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_Button_pressed"]

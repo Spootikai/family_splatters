@@ -1,3 +1,4 @@
+
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://scenes/Lobby.gd" type="Script" id=1]
@@ -9,7 +10,7 @@ anchor_bottom = 1.0
 theme = ExtResource( 2 )
 script = ExtResource( 1 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="IconHolder" type="HBoxContainer" parent="."]
 margin_right = 1920.0
 margin_bottom = 236.0
 size_flags_horizontal = 0
@@ -25,3 +26,5 @@ margin_right = 1299.0
 margin_bottom = 596.0
 disabled = true
 text = "Start The Game!!!"
+
+[connection signal="pressed" from="CenterContainer/Button" to="." method="_on_Button_pressed"]
