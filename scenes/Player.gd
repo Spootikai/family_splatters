@@ -1,7 +1,7 @@
 extends Node2D
 
 # Player variables
-onready var local_owned := false
+onready var player_id := -1
 onready var player_color: Color
 onready var player_title: String = "???"
 
@@ -100,7 +100,10 @@ func _process(delta):
 				if Input.is_action_just_released("click"):
 					knockback(get_viewport().get_mouse_position().direction_to(self.position).normalized())
 	if !local_owned:
-		Server.fetchPlayerPosition(self.get_instance_id(), game_id)
+		#Server.fetchPlayerPosition(self.get_instance_id(), game_id)
+		# Get position of this player instance
+		pass
+		
 	# EGG MODE BEHAVIOR
 	if mode == "egg":
 		if state == "knocked_back":

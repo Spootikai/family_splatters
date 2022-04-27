@@ -1,5 +1,6 @@
 extends Control
 
-func setPlayerData(s_mode, s_title, s_color):
-	$VBoxContainer/TextureRect.modulate = s_color
-	$VBoxContainer/Label.text = s_title
+var player_id = -1
+
+func _ready():
+	Server.fetchPlayerData()
