@@ -32,6 +32,7 @@ func _on_connection_failed():
 
 func _on_connection_succeeded():
 	print("Successfully connected")
+
 	pinging = true
 	
 	requestPlayerSettings(PlayerSettings.color, PlayerSettings.title, self.get_instance_id())
