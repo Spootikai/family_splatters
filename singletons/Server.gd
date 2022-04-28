@@ -1,7 +1,7 @@
 extends Node
 
 export var lobby_scene := "res://scenes/Lobby.tscn"
-export var game_scene := "res://scemes/Game.tscn"
+export var game_scene := "res://scenes/Game.tscn"
 
 enum {
 	LOBBY,
@@ -58,7 +58,8 @@ remote func serverUpdate():
 			PlayerSettings.is_host = true
 		else:
 			PlayerSettings.is_host = false
-	
+
+	print(players)
 	# Make sure to emit this signal at the end of the server update method
 	emit_signal("server_update")
 
@@ -71,6 +72,7 @@ func fetchColorAvailable(requester, color):
 remote func returnColorAvailable(requester, color, s_value):
 	instance_from_id(requester).returnColorAvailable(color, s_value)
 
+# Fetch/catch lobby join6
 func fetchLobbyJoin(color, title):
 	rpc_id(1, "fetchLobbyJoin", color, title)
 remote func returnLobbyJoin(color, title):
@@ -78,6 +80,27 @@ remote func returnLobbyJoin(color, title):
 	PlayerSettings.color = color
 	PlayerSettings.title = title
 	emit_signal("server_update")
+
+# Game start
+func requestStartGame():
+	rpc_id(1, "requestStartGame")
+remote func returnStartGame(s_launch, s_timer):
+	if !s_launch:
+		if get_tree().get_current_scene().get_name() == "Lobby":
+			var start_label = get_tree().get_root().get_node("Lobby/CenterContainer/StartLabel")
+			
+			var show_text: String
+			if s_timer <= 0:
+				show_text = "Trevor is fat"
+				start_label.visible = false
+			else:
+				show_text = str(ceil(s_timer))
+				start_label.visible = true
+
+			start_label.text = show_text
+	else:
+		pass
+		#actually start the damn game
 
 # Process
 func _process(delta):
@@ -87,6 +110,7 @@ func _process(delta):
 				get_tree().change_scene(lobby_scene)
 			pass
 		GAME:
-			if get_tree().get_current_sccne().get_name() !=  "Game":
+			if get_tree().get_current_scene().get_name() !=  "Game":
+				print("check please!")
 				get_tree().change_scene(game_scene)
 			pass
