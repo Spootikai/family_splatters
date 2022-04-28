@@ -4,7 +4,7 @@ onready var await_server = false
 
 func _ready():
 	Server.connect("server_update", self, "_on_server_update")
-	
+
 	# Update the buttons if the color picker has been made after lobby creation/
 	# Jank
 	if Server.players != null:
