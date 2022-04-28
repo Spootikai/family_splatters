@@ -26,23 +26,18 @@ func _on_server_update():
 	# Every update the button will be enabled if the player is host, and disabled otherwise
 	$CenterContainer/Button.disabled = !PlayerSettings.is_host
 	
-	for i in Server.players.size():
-		if !$IconHolder.get_child(i):
-			var new_lobby_icon = lobby_icon_instance.instance()
-			$IconHolder.add_child(new_lobby_icon)
+	for icon in $IconHolder.get_children():
+		icon.queue_free()
+	
+	for icon_number in Server.players.size():
+		var new_lobby_icon = lobby_icon_instance.instance()
+		$IconHolder.add_child(new_lobby_icon)
 
-	# Re adjust all existing lobby icons
-	if $IconHolder.get_child_count() > 0:
-		for i in $IconHolder.get_child_count():
-			var lobby_icon = $IconHolder.get_child(i)
-			
-			# Destroy excess lobby icons, and re tag existing ones
-			if Server.players.size() < i+1:
-				lobby_icon.queue_free()
-			else:
-				var icon_id = Server.players.keys()[i]
-				lobby_icon.get_node("Sprite").modulate = Server.players[icon_id].color
-				lobby_icon.get_node("Label").text = Server.players[icon_id].title
+		for player_id in Server.players:
+			var player = Server.players[player_id]
+			if player.order == icon_number:
+				new_lobby_icon.get_node("Sprite").modulate = player.color
+				new_lobby_icon.get_node("Label").text = player.title
 
 func _on_Button_pressed():
 	Server.requestStartGame()
