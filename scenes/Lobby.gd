@@ -1,4 +1,3 @@
-
 extends Control
 
 
@@ -15,10 +14,13 @@ func _ready():
 func _process(delta):
 	# Recreate the colorpicker if it has been closed
 	if get_node_or_null("CenterContainer/ColorPicker") == null:
-		if Input.is_action_just_pressed("escape"):
+		if Input.is_action_just_pressed("color_picker"):
 			var new_colorpicker = colorpicker_instance.instance()
 			$CenterContainer.add_child(new_colorpicker)
-			
+	else:
+		if Input.is_action_just_pressed("color_picker"):
+			$CenterContainer.get_node("ColorPicker").queue_free()
+
 onready var lobby_icon_instance = preload("res://scenes/LobbyIcon.tscn")
 func _on_server_update():
 	# Every update the button will be enabled if the player is host, and disabled otherwise
@@ -42,6 +44,5 @@ func _on_server_update():
 				lobby_icon.get_node("Sprite").modulate = Server.players[icon_id].color
 				lobby_icon.get_node("Label").text = Server.players[icon_id].title
 
-
 func _on_Button_pressed():
-	Server.startGameRequest()
+	Server.requestStartGame()
