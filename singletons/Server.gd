@@ -1,20 +1,24 @@
 extends Node
 
+export var lobby_scene := "res://scenes/Lobby.tscn"
+export var game_scene := "res://scemes/Game.tscn"
+
+enum {
+	LOBBY,
+	GAME
+}
+
+sync var game_state
 
 var self_id
 
-var players = {}
+signal server_update
+
+sync var players
 var network = NetworkedMultiplayerENet.new()
 
-# Automatically started once the server connection is established
-var pinging = false
-var ping_time_current = 0
-var ping_time = 0
-var ping_wait = false
-var ping_interval = 3
-var ping_interval_timer = 0
-
-func connect_to_server(ip = "127.0.0.1", port = 18181):
+var attempted = false
+func connect_to_server(ip = "35.160.170.69", port = 18181):
 	# Close pre existing connections just in case
 	network.close_connection() 
 	
@@ -22,82 +26,67 @@ func connect_to_server(ip = "127.0.0.1", port = 18181):
 	network.create_client(ip, port)
 	get_tree().set_network_peer(network)
 
-	# Connect reaction functions for connect/fail
-	network.connect("connection_failed", self, "_on_connection_failed")
-	network.connect("connection_succeeded", self, "_on_connection_succeeded")
+	# Connect signals
+	if !attempted:
+		network.connect("connection_failed", self, "_on_connection_failed")
+		network.connect("connection_succeeded", self, "_on_connection_succeeded")
+		network.connect("server_disconnected", self, "_on_server_disconnected")
+		attempted = true
 
 func _on_connection_failed():
 	print("Failed to connect")
-	pinging = false
 
 func _on_connection_succeeded():
 	print("Successfully connected")
-	pinging = true
-	
-	requestPlayerSettings(PlayerSettings.color, PlayerSettings.title, self.get_instance_id())
-	
-	get_tree().change_scene("res://scenes/Lobby.tscn")
 	self_id = get_tree().get_network_unique_id()
 
-func _on_server_timeout():
-	print("Server timed out")
-	get_tree().change_scene("res://scenes/MainMenu.tscn")
-	pinging = false
+func _on_server_disconnected():
+	print("Server disconnected")
+	
+# Actual server stuff
+remote func getError(err):
+	print("SERVER ERR: "+err)
 
-# Ping the server, also acts as a timeout indicator
-func _ping_server():
-	rpc_id(1, "_return_ping")
-	if ping_wait:
-		_on_server_timeout()
-	ping_wait = true
-remote func _return_ping():
-	ping_wait = false
-	ping_time_current = ping_time
-	#print("Ping: "+str(ping_time_current))
+remote func serverUpdate():
+	# Parse player data sent from the server if it hasnt been parsed yet
+	if typeof(players) == TYPE_STRING:
+		players = parse_json(players)
 
+	# Check if this client is the host of the lobby
+	if players.keys().size() > 0:
+		if int(players.keys()[0]) == self_id:
+			PlayerSettings.is_host = true
+		else:
+			PlayerSettings.is_host = false
+	
+	# Make sure to emit this signal at the end of the server update method
+	emit_signal("server_update")
+
+func finishLoading():
+	rpc_id(1, "finishLoading")
+
+# Fetch/catch color availability
+func fetchColorAvailable(requester, color):
+	rpc_id(1, "fetchColorAvailable", requester, color)
+remote func returnColorAvailable(requester, color, s_value):
+	instance_from_id(requester).returnColorAvailable(color, s_value)
+
+func fetchLobbyJoin(color, title):
+	rpc_id(1, "fetchLobbyJoin", color, title)
+remote func returnLobbyJoin(color, title):
+	print("Successfully joined the lobby!")
+	PlayerSettings.color = color
+	PlayerSettings.title = title
+	emit_signal("server_update")
+
+# Process
 func _process(delta):
-	if pinging:
-		if ping_wait:
-			ping_time += delta
-		else:
-			ping_time_current = ping_time
-			ping_time = 0
-
-		if ping_interval_timer >= ping_interval:
-			ping_interval_timer = 0
-			_ping_server()
-		else:
-			ping_interval_timer += delta
-
-# Player settings
-func requestPlayerSettings(color, title, requester):
-	rpc_id(1, "requestPlayerSettings", color, title, requester)
-
-remote func acceptPlayerSettings(s_is_host, requester):
-	print("Player settings accepted.")
-	if instance_from_id(requester) != self:
-		instance_from_id(requester).acceptPlayerSettings()
-
-remote func denyPlayerSettings(type, requester):
-	print("Player settings denied.")
-	if instance_from_id(requester) != self:
-		instance_from_id(requester).denyPlayerSettings(type)
-
-# Get the player list
-func fetchPlayerData():
-	rpc_id(1, "fetchPlayerData")
-remote func returnPlayerData(s_json):
-	players = parse_json(s_json)
-	updateLobbyIcons()
-
-# Update player icons in the lobby
-remote func updateLobbyIcons():
-	if get_tree().get_current_scene().get_name() == "Lobby":
-		print("did it work?")
-		get_tree().get_current_scene().updateLobbyIcons()
-
-# Request to start game
-func startGameRequest():
-	rpc_id(1, "startGameRequest")
-remote func startGame():
-	get_tree().change_scene("res://scenes/Game.tscn")
+	match game_state:
+		LOBBY:
+			if get_tree().get_current_scene().get_name() != "Lobby":
+				get_tree().change_scene(lobby_scene)
+			pass
+		GAME:
+			if get_tree().get_current_sccne().get_name() !=  "Game":
+				get_tree().change_scene(game_scene)
+			pass

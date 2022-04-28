@@ -31,7 +31,6 @@ margin_top = 116.0
 margin_right = 800.0
 margin_bottom = 226.0
 rect_min_size = Vector2( 0, 110 )
-text = "Spooticus"
 
 [node name="Adress" type="TextEdit" parent="VBoxContainer"]
 margin_top = 230.0
