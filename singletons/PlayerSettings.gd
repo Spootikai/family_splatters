@@ -1,4 +1,3 @@
-
 extends Node
 
 var title

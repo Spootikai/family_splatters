@@ -37,8 +37,7 @@ margin_top = 230.0
 margin_right = 800.0
 margin_bottom = 340.0
 rect_min_size = Vector2( 0, 110 )
-
-text = "35.160.170.69"
+text = "127.0.0.1"
 
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="text_changed" from="VBoxContainer/Username" to="." method="_on_Username_text_changed"]
