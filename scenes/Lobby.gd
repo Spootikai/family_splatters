@@ -35,6 +35,7 @@ func _on_server_update():
 
 		for player_id in Server.players:
 			var player = Server.players[player_id]
+			print(player)
 			if player.order == icon_number:
 				new_lobby_icon.get_node("Sprite").modulate = player.color
 				new_lobby_icon.get_node("Label").text = player.title
