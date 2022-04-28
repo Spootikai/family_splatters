@@ -1,9 +1,7 @@
-
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://scenes/Lobby.gd" type="Script" id=1]
 [ext_resource path="res://themes/main_menu.tres" type="Theme" id=2]
-[ext_resource path="res://scenes/LobbyIcon.tscn" type="PackedScene" id=3]
 [ext_resource path="res://fonts/BRLNSDB.TTF" type="DynamicFontData" id=4]
 
 [sub_resource type="DynamicFont" id=1]
@@ -25,8 +23,6 @@ margin_right = 5336.0
 margin_bottom = 540.0
 rect_scale = Vector2( 0.25, 0.25 )
 size_flags_horizontal = 0
-
-[node name="LobbyIcon" parent="IconHolder" instance=ExtResource( 3 )]
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 anchor_right = 1.0
