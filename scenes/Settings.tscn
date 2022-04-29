@@ -15,6 +15,8 @@
 texture = ExtResource( 4 )
 region_rect = Rect2( 0, 0, 930, 890 )
 
+[sub_resource type="Theme" id=5]
+
 [sub_resource type="StyleBoxTexture" id=2]
 texture = ExtResource( 9 )
 region_rect = Rect2( 0, 0, 411, 19 )
@@ -26,8 +28,6 @@ region_rect = Rect2( 0, 0, 401, 12 )
 [sub_resource type="StyleBoxTexture" id=3]
 texture = ExtResource( 10 )
 region_rect = Rect2( 0, 0, 401, 12 )
-
-[sub_resource type="Theme" id=5]
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -47,6 +47,17 @@ rect_pivot_offset = Vector2( 509, 246 )
 theme = ExtResource( 1 )
 custom_styles/panel = SubResource( 1 )
 
+[node name="SettingsLabel" type="Label" parent="Panel"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -88.5
+margin_top = 33.0
+margin_right = 88.5
+margin_bottom = 61.0
+theme = SubResource( 5 )
+text = "Settings"
+align = 1
+
 [node name="ExitButton" type="TextureButton" parent="Panel"]
 anchor_right = 0.083
 margin_left = 800.0
@@ -57,6 +68,16 @@ theme = ExtResource( 1 )
 texture_normal = ExtResource( 5 )
 texture_pressed = ExtResource( 6 )
 texture_hover = ExtResource( 2 )
+
+[node name="Sound" type="Label" parent="Panel"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -88.5
+margin_top = 129.0
+margin_right = 88.5
+margin_bottom = 157.0
+text = "Sound Effects"
+align = 1
 
 [node name="VolumeSlider" type="HSlider" parent="Panel"]
 anchor_left = 0.5
@@ -72,27 +93,6 @@ custom_styles/grabber_area_highlight = SubResource( 4 )
 custom_styles/grabber_area = SubResource( 3 )
 value = 50.0
 
-[node name="SettingsLabel" type="Label" parent="Panel"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = -88.5
-margin_top = 33.0
-margin_right = 88.5
-margin_bottom = 61.0
-theme = SubResource( 5 )
-text = "Settings"
-align = 1
-
-[node name="Sound" type="Label" parent="Panel"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = -88.5
-margin_top = 129.0
-margin_right = 88.5
-margin_bottom = 157.0
-text = "Sound Effects"
-align = 1
-
 [node name="Volume_Level" type="Label" parent="Panel"]
 margin_left = 686.0
 margin_top = 171.5
@@ -101,25 +101,15 @@ margin_bottom = 199.5
 text = "0"
 align = 1
 
-[node name="Player_Name" type="Label" parent="Panel"]
+[node name="Menu_Music_Label" type="Label" parent="Panel"]
 anchor_left = 0.5
-anchor_top = 0.443
 anchor_right = 0.5
-anchor_bottom = 0.443
-margin_left = -92.0
-margin_top = 58.45
-margin_right = 92.0
-margin_bottom = 88.45
-text = "Player Name"
+margin_left = -88.5
+margin_top = 218.0
+margin_right = 88.5
+margin_bottom = 246.0
+text = "Menu Music"
 align = 1
-
-[node name="LineEdit" type="LineEdit" parent="Panel"]
-margin_left = 291.0
-margin_top = 477.0
-margin_right = 606.0
-margin_bottom = 515.0
-align = 1
-max_length = 12
 
 [node name="MenuMusic" type="HSlider" parent="Panel"]
 anchor_left = 0.5
@@ -134,16 +124,6 @@ custom_styles/slider = SubResource( 2 )
 custom_styles/grabber_area_highlight = SubResource( 4 )
 custom_styles/grabber_area = SubResource( 3 )
 value = 50.0
-
-[node name="Menu_Music_Label" type="Label" parent="Panel"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = -88.5
-margin_top = 218.0
-margin_right = 88.5
-margin_bottom = 246.0
-text = "Menu Music"
-align = 1
 
 [node name="Menu_Level" type="Label" parent="Panel"]
 margin_left = 686.0
@@ -185,7 +165,27 @@ margin_bottom = 375.5
 text = "0"
 align = 1
 
-[node name="OptionButton" type="OptionButton" parent="Panel"]
+[node name="Player_Name" type="Label" parent="Panel"]
+anchor_left = 0.5
+anchor_top = 0.443
+anchor_right = 0.5
+anchor_bottom = 0.443
+margin_left = -92.0
+margin_top = 58.45
+margin_right = 92.0
+margin_bottom = 88.45
+text = "Player Name"
+align = 1
+
+[node name="LineEdit" type="LineEdit" parent="Panel"]
+margin_left = 291.0
+margin_top = 477.0
+margin_right = 606.0
+margin_bottom = 515.0
+align = 1
+max_length = 12
+
+[node name="Window_Mode" type="OptionButton" parent="Panel"]
 margin_left = 293.0
 margin_top = 591.0
 margin_right = 605.0
@@ -195,10 +195,11 @@ align = 1
 
 [connection signal="pressed" from="Panel/ExitButton" to="." method="_on_TextureButton_pressed"]
 [connection signal="value_changed" from="Panel/VolumeSlider" to="." method="_on_VolumeSlider_value_changed"]
-[connection signal="text_changed" from="Panel/LineEdit" to="." method="_on_LineEdit_text_changed"]
 [connection signal="value_changed" from="Panel/MenuMusic" to="." method="_on_VolumeSlider_value_changed"]
 [connection signal="value_changed" from="Panel/MenuMusic" to="." method="_on_MenuMusic_value_changed"]
 [connection signal="value_changed" from="Panel/GameMusic" to="." method="_on_GameMusic_value_changed"]
 [connection signal="value_changed" from="Panel/GameMusic" to="." method="_on_VolumeSlider_value_changed"]
 [connection signal="value_changed" from="Panel/GameMusic" to="." method="_on_MenuMusic_value_changed"]
-[connection signal="item_selected" from="Panel/OptionButton" to="." method="_on_OptionButton_item_selected"]
+[connection signal="text_changed" from="Panel/LineEdit" to="." method="_on_LineEdit_text_changed"]
+[connection signal="item_selected" from="Panel/Window_Mode" to="." method="_on_OptionButton_item_selected"]
+[connection signal="item_selected" from="Panel/Window_Mode" to="." method="_on_Window_Mode_item_selected"]
