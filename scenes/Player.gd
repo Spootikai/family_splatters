@@ -1,147 +1,121 @@
 extends Node2D
 
-# Server variables
-puppet var puppet_position = Vector2(0, 0) setget puppet_position_set
-puppet var puppet_rotation = 0
+var tween_speed = 0.15
+
+# New netcode
+var player_state
+var puppet_position: Vector2 = Vector2(0, 0)
+var puppet_target_position: Vector2 = Vector2(0, 0)
 
 # Player variables
-onready var player_color
-onready var player_title: String = "???"
-
-export var pale_weight = 0.25
+export var pale_weight = 0.3
+export var bird_opacity = 0.35
 
 # System variables
-onready var mode : String = "egg"
+onready var mode_previous : String
+onready var mode : String
 onready var state : String = "idle"
 
 export var click_deadzone : float = 0.1 # Time in seconds
 onready var click_timer : float = 0
 
 # Computational variables
-onready var start_moving = false # Used to smooth out the feel of movement
 onready var target_position: Vector2
-# onready var target_direction: Vector2 
-# onready var direction_facing: Vector2 = Vector2(0, -1)
+onready var target_direction: Vector2 
+onready var direction_facing: Vector2 = Vector2(0, -1)
 
-# Egg exclusive variables
-export var move_speed_egg = 1
-# export var knockback_force: float = 5
-# export var knockback_duration: float = 0.2 # Time in seconds
-# onready var knockback_timer: float = 0
-# onready var knocked_back = false
-# onready var knockback_direction: Vector2
+onready var cooldown_delay = 0.5
+onready var cooldown_time = 0
 
-# Bird exclusive variables
-# export var move_speed_bird = 2.5
-# export var turn_speed = 2
+onready var charge_time = 0
 
-# Attack charging
-# export var attack_charge_time: float = 3 # Time in seconds
-# export var attack_deadzone: float = 0.25 # Time in seconds 
-# export var attack_charge: float = 0
+# Server authoritative settings
+onready var move_speed_egg
+onready var move_speed_bird
+onready var turn_speed
+
+var is_local_owned 
+func _ready():
+	Server.connect("server_update", self, "_on_server_update")
+	if self.name == str(Server.self_id):
+		is_local_owned = true
+	else:
+		is_local_owned = false
+	
+	move_speed_egg = Server.game_settings["E"]
+	move_speed_bird = Server.game_settings["B"]
+	turn_speed = Server.game_settings["T"]
+	
+	update()
 
 # Server stuff
-onready var tween = $Tween
-func puppet_position_set(new_value) -> void:
-	puppet_position = new_value
-	
-	tween.interpolate_property(self, "global_position", global_position, puppet_position, 0.1)
-	tween.start()
-
-func _on_Tickrate_timeout():
+func _on_server_update():
+	print("Update!")
 	update()
-	if is_network_master():
-		rset_unreliable("puppet_position", global_position)
-		rset_unreliable("puppet_rotation", rotation_degrees)
 
-# TICK PROCESSES
-func _process(delta):
-	if is_network_master():
+func definePlayerState():
+	player_state = {"T": Server.client_clock, "X": self.target_position}
+	Server.sendPlayerState(player_state)
+
+# Tick 60 times per second
+func _physics_process(delta):
+	if is_local_owned:
+		
+		definePlayerState()
+
 		match mode:
-			#"bird":
-			#	# Update the target position
-			#	target_position = get_viewport().get_mouse_position()
-			#
-			#	# Have a deadzone for clicking; clicking quickly makes fast shits
-			#	# Charge up attack
-			#	if Input.is_action_just_pressed("bird_fire"):
-			#		attack_charge = 0
-			#	if Input.is_action_pressed("bird_fire"):
-			#		if attack_charge < attack_charge_time:
-			#			attack_charge += delta
-			#	if Input.is_action_just_released("bird_fire"):
-			#		# If the click was briefer than the deadzone, pretend it wasnt charged
-			#		if attack_charge < (attack_deadzone):
-			#			attack_charge = 0
-			#
-			#		# Create a shit scene now
-			#		#
-			#		# here
-			#		#
-			
-			#	# Get the normal direction towards the target position
-			#	target_direction = self.position.direction_to(target_position)
-
-			#	# Find the shortest point from the direction facing to the target direction (given a weight; turn_speed)
-			#	var dir_from = direction_facing.angle()
-			#	var dir_to = target_direction.angle()
-
-			#	var difference = fmod(dir_to - dir_from, PI * 2)
-			#	var turn_angle = dir_from + (fmod(2*difference, PI*2) - difference) * (turn_speed*delta)
-			#	
-			#	# Add the turning increment to the direction facing
-			#	direction_facing = Vector2.RIGHT.rotated(turn_angle)
-
-			#	# Rotate the bird sprite in radians based on the direction facing variable
-			#	$SpriteBird.rotation = direction_facing.angle()-Vector2.UP.angle() # Account for the rotation of the original sprite
-			#	
-			#	# Constantly move the bird forward like it's soaring
-			#	self.position += direction_facing*move_speed_bird*(1-delta)
-
+			"bird":
+				target_position = get_global_mouse_position()
+				if Input.is_action_just_released("bird_fire"):
+					if Server.client_clock > cooldown_time:
+						charge_time = clamp(charge_time, 0.25, 3)
+						var aim_dir = self.global_position.direction_to(get_global_mouse_position())
+						Server.sendProjectile(charge_time, aim_dir.angle())
+						cooldown_time = Server.client_clock+(cooldown_delay*1000)
+					else:
+						charge_time = 0
+				if Input.is_action_pressed("bird_fire"):
+					charge_time += delta
 			"egg":
-				# Have a deadzone for clicking: it wont start following the cursor while holding immediately
-				# Update the target position
 				if Input.is_action_just_pressed("egg_move"):
 					target_position = get_viewport().get_mouse_position()
-					start_moving = true
 				if Input.is_action_pressed("egg_move"):
 					if click_timer < click_deadzone:
 						click_timer += delta
 					else:
 						target_position = get_viewport().get_mouse_position()
-				if Input.is_action_just_released("egg_move"):
-					click_timer = 0
-				
-				# Egg mode state machine
-				match state:
-					"idle":
-						if start_moving:
-							state = "moving"
-					"moving":
-						if start_moving and self.position.distance_to(target_position) > move_speed_egg:
-							var normal = self.position.direction_to(target_position)
-							self.position += normal*move_speed_egg*(1-delta)
-						else:
-							state = "idle"
-	else:
-		rotation_degrees = lerp(rotation_degrees, puppet_rotation, delta*8)
+					if Input.is_action_just_released("egg_move"):
+						click_timer = 0
 
-# Switch mode method, works as toggle without argument
-func switch_mode(newmode = "none"):
-	# Clear target when switching modes 
-	target_position = self.position 
+# Puppet behavior
+func _world_update(my_state):
+	puppet_target_position = my_state["X"]
+	puppet_position = my_state["P"]
+	mode = my_state["M"]
 	
-	# Actually toggle between modes/set mode
-	if newmode == "none":
-		if mode == "egg":
-			mode = "bird"
-		elif mode == "bird":
-			mode = "egg"
-	else:
-		mode = newmode
+	# Make sure that mode changes are detected
+	if mode != mode_previous:
+		direction_facing = my_state["F"]
+		update()
 	
-	# Update to make sure everything is correct
-	update()
+	mode_previous = mode
+	
+	var tween_position = self.get_node("TweenPosition")
+	tween_position.interpolate_property(self, "global_position", self.global_position, puppet_position, tween_speed)
+	tween_position.start()
+
+func _process(delta):
+	if mode == "bird":
+		var dir_from = direction_facing.angle()
+		var dir_to = self.global_position.direction_to(puppet_target_position).angle()
+
+		var difference = fmod(dir_to - dir_from, PI * 2)
+		var turn_angle = dir_from + (fmod(2*difference, PI*2) - difference) * (turn_speed*delta)
+
+		direction_facing = Vector2.RIGHT.rotated(turn_angle)
+
+		# Rotate the bird sprite in radians based on the direction facing variable
+		$SpriteBird.rotation = direction_facing.angle()-Vector2.UP.angle()
 
 # Visual updates
 func update():
@@ -149,7 +123,11 @@ func update():
 	$SpriteBird.modulate = new_color
 	$SpriteEgg.modulate = new_color
 	
+	$SpriteBird.modulate.a = 1.0
+	
 	if mode == "bird":
+		if !is_local_owned:
+			$SpriteBird.modulate.a = bird_opacity
 		$SpriteBird.visible = true
 		$SpriteEgg.visible = false
 	elif mode == "egg":

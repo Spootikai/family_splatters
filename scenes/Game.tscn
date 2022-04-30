@@ -2,9 +2,10 @@
 
 [ext_resource path="res://scenes/Game.gd" type="Script" id=1]
 [ext_resource path="res://assets/background.png" type="Texture" id=2]
-[ext_resource path="res://fonts/Poppins-Medium.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://fonts/BRLNSDB.TTF" type="DynamicFontData" id=3]
 
 [sub_resource type="DynamicFont" id=1]
+size = 192
 outline_color = Color( 1, 1, 1, 0.490196 )
 font_data = ExtResource( 3 )
 
@@ -18,9 +19,22 @@ script = ExtResource( 1 )
 position = Vector2( 960, 540 )
 texture = ExtResource( 2 )
 
-[node name="Label" type="Label" parent="."]
-margin_right = 140.0
-margin_bottom = 116.0
-theme = SubResource( 2 )
-
 [node name="Players" type="Node2D" parent="."]
+
+[node name="Projectiles" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 960, 540 )
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 1920.0
+margin_bottom = 1080.0
+
+[node name="Winner" type="Label" parent="CenterContainer"]
+margin_left = 960.0
+margin_top = 431.0
+margin_right = 960.0
+margin_bottom = 649.0
+theme = SubResource( 2 )
