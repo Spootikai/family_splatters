@@ -9,13 +9,14 @@ enum {
 }
 
 sync var game_state
+var game_launch_time = 0
 
 var self_id
 
 signal server_update
 signal player_update
 
-var p_data = {}
+var game_settings = {}
 sync var players
 var network = NetworkedMultiplayerENet.new()
 
@@ -41,11 +42,50 @@ func _on_connection_failed():
 func _on_connection_succeeded():
 	print("Successfully connected")
 	self_id = get_tree().get_network_unique_id()
+	
+	# Server time synchronization
+	rpc_id(1, "fetchServerTime", OS.get_system_time_msecs())
+	var sync_timer = Timer.new()
+	sync_timer.wait_time = 0.5
+	sync_timer.autostart = true
+	sync_timer.connect("timeout", self, "determineLatency")
+	self.add_child(sync_timer)
 
 func _on_server_disconnected():
 	print("Server disconnected")
 	
-# Actual server stuff
+# Server time synchronization
+var client_clock = 0 
+var decimal_collector: float = 0
+var latency_array = []
+var latency = 0
+var delta_latency = 0
+remote func returnServerTime(server_time, client_time):
+	latency = (OS.get_system_time_msecs() - client_time)/2
+	client_clock = server_time + latency
+
+func determineLatency():
+	rpc_id(1, "determineLatency", OS.get_system_time_msecs())
+
+remote func returnLatency(client_time):
+	latency_array.append((OS.get_system_time_msecs() - client_time) / 2)
+	if latency_array.size() == 9:
+		var total_latency = 0
+		latency_array.sort()
+		var mid_point = latency_array[4]
+		for i in range(latency_array.size()-1, -1, -1):
+			if latency_array[i] > (2 * mid_point) and latency_array[i] > 20:
+				latency_array.remove(i)
+			else:
+				total_latency += latency_array[i]
+		
+		delta_latency = (total_latency/latency_array.size()) - latency
+		latency = total_latency/latency_array.size()
+		print("New latency: ", latency)
+		print("Delta latency: ", delta_latency)
+		latency_array.clear()
+
+# Server stuff
 remote func getError(err):
 	print("SERVER ERR: "+err)
 
@@ -56,17 +96,15 @@ remote func serverUpdate():
 
 	# Check if this client is the host of the lobby
 	if players.size() > 0:
-		var client_player = players[str(self_id)]
-		if client_player.order == 0:
-			PlayerSettings.is_host = true
-		else:
-			PlayerSettings.is_host = false
+		if players.keys().find(str(self_id)) != -1:
+			var client_player = players[str(self_id)]
+			if client_player.order == 0:
+				PlayerSettings.is_host = true
+			else:
+				PlayerSettings.is_host = false
 
 	# Make sure to emit this signal at the end of the server update method
 	emit_signal("server_update")
-
-func finishLoading():
-	rpc_id(1, "finishLoading")
 
 # Fetch/catch color availability
 func fetchColorAvailable(requester, color):
@@ -83,62 +121,60 @@ remote func returnLobbyJoin(color, title):
 	PlayerSettings.title = title
 	emit_signal("server_update")
 
+
+### New Netcode ###
 # Game start
 func requestStartGame():
 	rpc_id(1, "requestStartGame")
-remote func returnStartGame(s_launch, s_timer):
-	# Getting callbacks for the countdown
-	if !s_launch:
-		if get_tree().get_current_scene().get_name() == "Lobby":
-			var start_label = get_tree().get_root().get_node("Lobby/CenterContainer/StartLabel")
-			
-			var show_text: String
-			if s_timer <= 0:
-				show_text = "Trevor is fat"
-				start_label.visible = false
-			else:
-				show_text = str(ceil(s_timer))
-				start_label.visible = true
+remote func returnStartGame(s_launch_time):
+	game_launch_time = s_launch_time
 
-			start_label.text = show_text
-
-func loadGame():
-	get_tree().set_pause(true)
-	
-	for player_id in players.keys():
-		instancePlayer(player_id)
-	
+func finishLoading():
 	rpc_id(1, "finishLoading")
-remote func loadGameComplete():
-	get_tree().set_pause(false)
 
-onready var player_instance = preload("res://scenes/Player.tscn")
-remote func instancePlayer(player_id):
-	player_id = int(player_id)
-	
-	var player_holder = get_node("/root/Game/Players")
-	var new_player_instance = player_instance.instance()
-	player_holder.add_child(new_player_instance)
-	
-	new_player_instance.position = Vector2(rand_range(0, 1920), rand_range(0, 1080))
-	new_player_instance.name = str(player_id)
-	new_player_instance.set_network_master(player_id)
+remote func recieveServerSettings(s_dict):
+	game_settings = s_dict
 
-remote func destroyPlayer(player_id):
-	player_id = int(player_id)
-	
-	var player_holder = get_node("/root/Game/Players")
-	if player_holder.has_node(str(player_id)):
-		player_holder.get_node(str(player_id)).queue_free()
+# Syncing world and player
+func sendProjectile(charge_time, aim_dir):
+	rpc_id(1, "recieveProjectile", charge_time, aim_dir)
+
+remote func recieveProjectile(spawn_position, velocity, timeout, size):
+	get_node("/root/Game").projectileSpawn(spawn_position, velocity, timeout, size)
+
+func sendPlayerState(player_state):
+	rpc_unreliable_id(1, "recievePlayerState", player_state)
+
+remote func recieveWorldState(world_state):
+	get_node("/root/Game").updateWorldState(world_state)
+
+remote func gameWinner(player_id):
+	if get_tree().get_current_scene().get_name() == "Game":
+		get_node("/root/Game").get_node("CenterContainer/Winner").text = "Winner: "+str(players[str(player_id)].title)
 
 # Process
 func _process(delta):
+	# Server time synchronization
+	var delta_ms = delta*1000
+	
+	client_clock += int(delta_ms) + delta_latency
+	delta_latency = 0
+	decimal_collector += (delta_ms) - int(delta_ms)
+	if decimal_collector >= 1.00:
+		client_clock += 1
+		decimal_collector -= 1.00
+	
+	# Game state behavior
 	match game_state:
 		LOBBY:
 			if get_tree().get_current_scene().get_name() != "Lobby":
 				get_tree().change_scene(lobby_scene)
-			pass
+			else:
+				if game_launch_time > 0:
+					if client_clock >= game_launch_time:
+						print("Game state changing to: GAME")
+						game_state = GAME
 		GAME:
+			game_launch_time = 0
 			if get_tree().get_current_scene().get_name() !=  "Game":
 				get_tree().change_scene(game_scene)
-			pass
